@@ -4,6 +4,7 @@ import jerryproject.springrestfulapi.model.LoginUserRequest;
 import jerryproject.springrestfulapi.model.TokenResponse;
 import jerryproject.springrestfulapi.model.WebResponse;
 import jerryproject.springrestfulapi.service.AuthService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AuthController {
 
+    @Autowired
     private AuthService authService;
 
     @PostMapping(
