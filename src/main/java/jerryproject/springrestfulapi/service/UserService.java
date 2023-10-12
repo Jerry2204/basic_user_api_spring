@@ -5,6 +5,7 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import jerryproject.springrestfulapi.entity.User;
 import jerryproject.springrestfulapi.model.RegisterUserRequest;
+import jerryproject.springrestfulapi.model.UserResponse;
 import jerryproject.springrestfulapi.repository.UserRepository;
 import jerryproject.springrestfulapi.security.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,13 @@ public class UserService {
         user.setName(request.getName());
 
         userRepository.save(user);
+    }
+
+    public UserResponse get(User user) {
+        return UserResponse.builder()
+                .username(user.getUsername())
+                .name(user.getName())
+                .build();
     }
 
 }
