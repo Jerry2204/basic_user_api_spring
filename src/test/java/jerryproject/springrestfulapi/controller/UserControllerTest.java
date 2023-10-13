@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jerryproject.springrestfulapi.entity.User;
 import jerryproject.springrestfulapi.model.RegisterUserRequest;
+import jerryproject.springrestfulapi.model.UpdateUserRequest;
 import jerryproject.springrestfulapi.model.UserResponse;
 import jerryproject.springrestfulapi.model.WebResponse;
 import jerryproject.springrestfulapi.repository.UserRepository;
@@ -193,6 +194,25 @@ class UserControllerTest {
                 status().isUnauthorized()
         ).andDo(result -> {
             WebResponse<UserResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+
+            assertNotNull(response.getErrors());
+        });
+    }
+
+    @Test
+    void updateUserUnauthorized() throws Exception {
+        UpdateUserRequest request = new UpdateUserRequest();
+
+        mockMvc.perform(
+                patch("/api/users/current")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+        ).andExpectAll(
+                status().isUnauthorized()
+        ).andDo(result -> {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
 
             assertNotNull(response.getErrors());
