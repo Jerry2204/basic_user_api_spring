@@ -5,6 +5,7 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import jerryproject.springrestfulapi.entity.User;
 import jerryproject.springrestfulapi.model.RegisterUserRequest;
+import jerryproject.springrestfulapi.model.UpdateUserRequest;
 import jerryproject.springrestfulapi.model.UserResponse;
 import jerryproject.springrestfulapi.repository.UserRepository;
 import jerryproject.springrestfulapi.security.BCrypt;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -46,6 +48,26 @@ public class UserService {
         return UserResponse.builder()
                 .username(user.getUsername())
                 .name(user.getName())
+                .build();
+    }
+
+    @Transactional
+    public UserResponse update(User user, UpdateUserRequest request) {
+        validationService.validate(request);
+
+        if (Objects.nonNull(request.getName())) {
+            user.setName(request.getName());
+        }
+
+        if (Objects.nonNull(request.getPassword())) {
+            user.setPassword(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt()));
+        }
+
+        userRepository.save(user);
+
+        return UserResponse.builder()
+                .name(user.getName())
+                .username(user.getUsername())
                 .build();
     }
 
