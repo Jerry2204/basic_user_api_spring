@@ -30,6 +30,7 @@ public class ContactService {
         contact.setLastName(request.getLastName());
         contact.setEmail(request.getEmail());
         contact.setPhone(request.getPhone());
+        contact.setUser(user);
         contactRepository.save(contact);
 
         return ContactResponse.builder()

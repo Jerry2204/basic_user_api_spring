@@ -3,6 +3,7 @@ package jerryproject.springrestfulapi.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jerryproject.springrestfulapi.entity.User;
+import jerryproject.springrestfulapi.model.ContactResponse;
 import jerryproject.springrestfulapi.model.CreateContactRequest;
 import jerryproject.springrestfulapi.model.WebResponse;
 import jerryproject.springrestfulapi.repository.ContactRepository;
@@ -73,6 +74,36 @@ class ContactControllerTest {
 
             assertNotNull(response.getErrors());
 
+        });
+    }
+
+    @Test
+    void createContactSuccess() throws Exception {
+        CreateContactRequest request = new CreateContactRequest();
+        request.setFirstName("Jerry");
+        request.setLastName("Pangaribuan");
+        request.setEmail("jerry@example.com");
+        request.setPhone("082382483");
+
+        mockMvc.perform(
+                post("/api/contacts")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("X-API-TOKEN", "test")
+        ).andExpectAll(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<ContactResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+
+            assertNull(response.getErrors());
+            assertEquals("Jerry", response.getData().getFirstName());
+            assertEquals("Pangaribuan", response.getData().getLastName());
+            assertEquals("jerry@example.com", response.getData().getEmail());
+            assertEquals("082382483", response.getData().getPhone());
+
+            assertTrue(contactRepository.existsById(response.getData().getId()));
         });
     }
 }
