@@ -184,4 +184,45 @@ class ContactControllerTest {
 
         });
     }
+
+    @Test
+    void updateContactSuccess() throws Exception {
+        User user = userRepository.findById("test").orElseThrow();
+
+        Contact contact = new Contact();
+        contact.setId(UUID.randomUUID().toString());
+        contact.setUser(user);
+        contact.setFirstName("Jerry");
+        contact.setLastName("Pangaribuan");
+        contact.setEmail("test@example.com");
+        contact.setPhone("08228473847");
+        contactRepository.save(contact);
+
+        CreateContactRequest request = new CreateContactRequest();
+        request.setFirstName("Budi");
+        request.setLastName("Nugraha");
+        request.setEmail("budi@example.com");
+        request.setPhone("08238122483");
+
+        mockMvc.perform(
+                put("/api/contacts/" + contact.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("X-API-TOKEN", "test")
+        ).andExpectAll(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<ContactResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+
+            assertNull(response.getErrors());
+            assertEquals(request.getFirstName(), response.getData().getFirstName());
+            assertEquals(request.getLastName(), response.getData().getLastName());
+            assertEquals(request.getEmail(), response.getData().getEmail());
+            assertEquals(request.getPhone(), response.getData().getPhone());
+
+            assertTrue(contactRepository.existsById(response.getData().getId()));
+        });
+    }
 }
