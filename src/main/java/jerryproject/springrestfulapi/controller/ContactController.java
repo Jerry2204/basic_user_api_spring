@@ -3,6 +3,7 @@ package jerryproject.springrestfulapi.controller;
 import jerryproject.springrestfulapi.entity.User;
 import jerryproject.springrestfulapi.model.ContactResponse;
 import jerryproject.springrestfulapi.model.CreateContactRequest;
+import jerryproject.springrestfulapi.model.UpdateContactRequest;
 import jerryproject.springrestfulapi.model.WebResponse;
 import jerryproject.springrestfulapi.service.ContactService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,20 @@ public class ContactController {
     public WebResponse<ContactResponse> get(User user, @PathVariable("contactId") String contactId) {
         ContactResponse contactResponse = contactService.get(user, contactId);
 
+        return WebResponse.<ContactResponse>builder().data(contactResponse).build();
+    }
+
+    @PutMapping(
+            path = "/api/contacts/{contactId}",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<ContactResponse> update(User user,
+                                               @RequestBody UpdateContactRequest request,
+                                               @PathVariable("contactId") String contactId) {
+
+        request.setId(contactId);
+        ContactResponse contactResponse = contactService.update(user, request);
         return WebResponse.<ContactResponse>builder().data(contactResponse).build();
     }
 
