@@ -6,6 +6,7 @@ import jerryproject.springrestfulapi.entity.Contact;
 import jerryproject.springrestfulapi.entity.User;
 import jerryproject.springrestfulapi.model.ContactResponse;
 import jerryproject.springrestfulapi.model.CreateContactRequest;
+import jerryproject.springrestfulapi.model.UpdateContactRequest;
 import jerryproject.springrestfulapi.model.WebResponse;
 import jerryproject.springrestfulapi.repository.ContactRepository;
 import jerryproject.springrestfulapi.repository.UserRepository;
@@ -158,6 +159,29 @@ class ContactControllerTest {
             assertEquals(contact.getLastName(), response.getData().getLastName());
             assertEquals(contact.getEmail(), response.getData().getEmail());
             assertEquals(contact.getPhone(), response.getData().getPhone());
+        });
+    }
+
+    @Test
+    void updateContactBadRequest() throws Exception {
+        UpdateContactRequest request = new UpdateContactRequest();
+        request.setFirstName("");
+        request.setEmail("salah");
+
+        mockMvc.perform(
+                put("/api/contacts/1234")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("X-API-TOKEN", "test")
+        ).andExpectAll(
+                status().isBadRequest()
+        ).andDo(result -> {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<WebResponse<String>>() {
+            });
+
+            assertNotNull(response.getErrors());
+
         });
     }
 }
